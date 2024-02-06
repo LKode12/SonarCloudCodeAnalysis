@@ -6,6 +6,7 @@ const userData = require("./MOCK_DATA.json");
 const graphql = require("graphql");
 const { GraphQLObjectType, GraphQLSchema, GraphQLList, GraphQLInt, GraphQLString } = graphql;
 const { graphqlHTTP } = require("express-graphql");
+const validator = require("validator");
 
 // Define the User type
 const UserType = new GraphQLObjectType({
@@ -15,8 +16,6 @@ const UserType = new GraphQLObjectType({
         firstName: { type: GraphQLString },
         lastName: { type: GraphQLString },
         email: { type: GraphQLString },
-        // Do not expose the password field in GraphQL queries
-        // password: { type: GraphQLString },
     })
 });
 
@@ -35,7 +34,6 @@ const RootQuery = new GraphQLObjectType({
             description: "Fetch single user by ID",
             args: { id: { type: GraphQLInt } },
             resolve(parent, args) {
-                // Prevent returning sensitive user data (e.g., passwords)
                 const user = userData.find((user) => user.id === args.id);
                 if (!user) {
                     throw new Error("User not found");
@@ -64,21 +62,20 @@ const Mutation = new GraphQLObjectType({
                 password: { type: GraphQLString },
             },
             resolve(parent, args) {
-                // Validate user input (e.g., check for required fields)
                 if (!args.firstName || !args.lastName || !args.email || !args.password) {
                     throw new Error("All fields are required");
                 }
-                // Generate a unique ID for the new user
-                const id = userData.length > 0 ? userData[userData.length - 1].id + 1 : 1;
+                if (!validator.isEmail(args.email)) {
+                    throw new Error("Invalid email address");
+                }
+                const hashedPassword = hashPassword(args.password);
                 const newUser = {
-                    id,
+                    id: userData.length + 1,
                     firstName: args.firstName,
                     lastName: args.lastName,
                     email: args.email,
-                    // Hash the password before storing it
-                    password: hashPassword(args.password),
+                    password: hashedPassword,
                 };
-                // Store the new user data
                 userData.push(newUser);
                 return newUser;
             }
@@ -97,7 +94,6 @@ app.use("/graphql", graphqlHTTP({
 
 // REST endpoint to get all users
 app.get("/rest/getAllUsers", (req, res) => {
-    // Do not expose sensitive user data (e.g., passwords)
     const users = userData.map(user => ({
         id: user.id,
         firstName: user.firstName,
@@ -116,4 +112,7 @@ app.listen(PORT, () => {
 });
 
 // Hash the password before storing it in the database
-function hashPassword(p
+function hashPassword(password) {
+    // You should use a secure hashing algorithm (e.g., bcrypt) here
+    return password;
+}
