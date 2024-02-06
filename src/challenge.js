@@ -1,4 +1,5 @@
 const express = require("express");
+const helmet = require("helmet");
 const app = express();
 const PORT = 5000;
 const userData = require("./MOCK_DATA.json");
@@ -106,13 +107,13 @@ app.get("/rest/getAllUsers", (req, res) => {
     res.json(users);
 });
 
+// Middleware to remove X-Powered-By header and set secure headers
+app.use(helmet());
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
 // Hash the password before storing it in the database
-function hashPassword(password) {
-    // You should use a secure hashing algorithm (e.g., bcrypt) here
-    return password;
-}
+function hashPassword(p
