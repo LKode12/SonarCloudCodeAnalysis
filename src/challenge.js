@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 
+// Hide version information
+app.disable('x-powered-by');
+
 // Mock database and exec function for demonstration purposes
 const db = {
   query: (query, callback) => {
