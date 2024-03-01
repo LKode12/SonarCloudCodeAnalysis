@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v1
 
       - name: Install Azure CLI
-        uses: azure/setup-azure-cli@v1
+        uses: Azure/cli@v1.0.9
         with:
           install-script-url: https://aka.ms/installazurecliwindows
 
