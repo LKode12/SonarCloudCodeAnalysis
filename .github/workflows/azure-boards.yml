@@ -14,9 +14,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install Azure CLI
-        uses: azure/setup-azure-cli@v2
+        uses: azure/setup-azure-cli@v1
         with:
-          install-script-url: https://aka.ms/InstallAzureCLIDeb
+          install-script-url: https://aka.ms/installazurecliwindows
+
 
       - name: Authenticate with Azure DevOps
         run: az devops login --organization https://dev.azure.com/ingridmawasha --token $(AZURE_SECRET)
