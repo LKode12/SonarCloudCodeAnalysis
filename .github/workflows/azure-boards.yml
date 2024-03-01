@@ -1,0 +1,26 @@
+name: Azure Boards Integration
+
+on:
+  issues:
+    types: [opened, edited, deleted]
+  pull_request:
+    types: [opened, edited, closed]
+
+jobs:
+  update-azure-board:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Azure CLI
+        uses: azure/setup-azure-cli@v1
+        with:
+          install-script-url: https://aka.ms/InstallAzureCLIDeb
+
+      - name: Authenticate with Azure DevOps
+        run: az devops login --organization https://dev.azure.com/ingridmawasha --token $(AZURE_SECRET)
+
+      - name: Update Azure Board Work Item
+        run: |
+          az boards work-item update --id 1 --title "Updated Title" --description "Updated Description"
